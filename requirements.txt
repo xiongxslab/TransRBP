@@ -1,0 +1,10 @@
+biopython==1.78
+captum==0.6.0
+h5py==3.9.0
+numpy==1.24.3
+pandas==2.1.1
+pybigwig==0.3.22
+pyfaidx==0.8.1.1
+scipy==1.11.2
+tensorboard==2.12.0
+tqdm==4.66.1 
