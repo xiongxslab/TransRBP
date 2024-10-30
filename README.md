@@ -6,7 +6,7 @@ Jianche Liu#, Xinlu Zhu#, Yang Yin#, Zhoutong Xu, Jialin He, Xushen Xiong*
 
 ## Introduction
 TransRBP, a novel Transformer-based deep learning framework for modeling RBP binding profiles at a base-resolution fromwith RNA sequences.
-![overview](https://github.com/IAMZhuXinlu/TransRBP/blob/main/overview.jpg)
+![overview](https://github.com/IAMZhuXinlu/TransRBP/blob/main/overview.png)
 
 ## Requirements and Installation
 
