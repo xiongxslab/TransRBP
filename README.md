@@ -88,10 +88,12 @@ Options:
 --whether_grad_norm_clip    Flag to specify whether gradient norm clipping is used. Default: 1.
 --grad_norm_clip    The value of gradient norm clip. Default: 5.
 --tb_dir    The directory to save tensorboard logs.
+--m6A_binding Whether to bind m6A track in input, 1 means enabled. If not, will train the seq-only model.
 --save_model_dir    The directory to save the trained model.
 --data_root Root path to training data.
 --max_epoch The max epochs for training. Default: 100.
 --tol_epoch The tolerance epochs for early stop. Default: 10
+
 
 ```
 
