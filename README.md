@@ -60,7 +60,10 @@ root
 |   ├── chr20.fa.gz
 |   ├── chr21.fa.gz
 |   └── chr22.fa.gz
-|
+|── m6A
+|   ├── MeRIP_signal_minus.bw
+|   └── MeRIP_signal_plus.bw
+|  
 └── RBP
     ├── DDX43
     |   ├── bindingpeak.bed
