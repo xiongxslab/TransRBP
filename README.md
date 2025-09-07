@@ -2,11 +2,11 @@
 
 This is the official implementation of our paper:
 ### In-silico modeling of RBP binding disentangles m6A-RBP interaction and reveals genetic disease mechanisms
-Jianche Liu#, Xinlu Zhu#, Yang Yin#, Zhoutong Xu, Jialin He, Xushen Xiong*
+Jianche Liu#, Xinlu Zhu#, Yao An#, Yang Yin#, Zhoutong Xu, Jialin He, Lei Xiong, Xiaoyu Li*, Xushen Xiong*
 
 ## Introduction
-TransRBP, a novel Transformer-based deep learning framework for modeling RBP binding profiles at a base-resolution fromwith RNA sequences.
-![overview](https://github.com/IAMZhuXinlu/TransRBP/blob/main/overview.png)
+TransRBP, a novel Transformer-based multimodal deep learning framework for modeling RBP binding profiles at a base-resolution from with m6A signals and RNA sequences.
+![overview](https://github.com/xiongxslab/TransRBP/blob/main/TransRBP_overview.png)
 
 ## Requirements and Installation
 
@@ -88,7 +88,7 @@ Options:
 --whether_grad_norm_clip    Flag to specify whether gradient norm clipping is used. Default: 1.
 --grad_norm_clip    The value of gradient norm clip. Default: 5.
 --tb_dir    The directory to save tensorboard logs.
---m6A_binding Whether to bind m6A track in input, 1 means enabled. If not, will train the seq-only model.
+--m6A_binding    Whether to bind m6A track in input, 1 means enabled. If not, will train the seq-only model.
 --save_model_dir    The directory to save the trained model.
 --data_root Root path to training data.
 --max_epoch The max epochs for training. Default: 100.
