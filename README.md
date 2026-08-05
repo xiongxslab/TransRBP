@@ -30,14 +30,14 @@ python evaluation/predict.py --help
 
 ## Download Pre-trained Data (Zenodo)
 
-Pre-trained full model (5-channels) weights and train/val/test BED files for all 32 m6A-associated RBPs are available on Zenodo: **[DOI link]**
+Pre-trained full model (5-channels) weights and train/val/test BED files for all 32 m6A-associated RBPs are available on Zenodo: **[10.5281/zenodo.21797681]**
 
 ### How to organise after download
 
 1. **Clone the repo:**
    
    ```bash
-   git clone https://github.com/your-org/TransRBP-m6A.git
+   git clone https://github.com/xiongxslab/TransRBP.git
    cd TransRBP-m6A
    pip install -e .
    ```
