@@ -38,9 +38,7 @@ Pre-trained full model (5-channels) weights and train/val/test BED files for all
 
 ### How to organise after download
 
-1. **Clone the repo and install:**
-   
-  See Installation above
+1. **Clone the repo and install:** (See Installation above)
 
 2. **Download from Zenodo and place files inside the repo root.** The expected layout is:
 
