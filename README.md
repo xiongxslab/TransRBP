@@ -30,7 +30,7 @@ python evaluation/predict.py --help
 
 ## Download Pre-trained Data (Zenodo)
 
-Pre-trained full model (5-channels) weights and train/val/test BED files for all 32 m6A-associated RBPs are available on Zenodo: [Clickable Text](10.5281/zenodo.21797681)
+Pre-trained full model (5-channels) weights and train/val/test BED files for all 32 m6A-associated RBPs are available on Zenodo: [Zenodo]((https://zenodo.org/records/21797682))
 
 ### How to organise after download
 
