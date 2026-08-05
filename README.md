@@ -1,4 +1,4 @@
-[README.md](https://github.com/user-attachments/files/30725290/README.md)
+
 # TransRBP: m<sup>6</sup>A-Aware RBP Binding Prediction
 
 TransRBP predicts RNA-binding protein (RBP) binding signal from sequence using a ResNet-Transformer architecture. The m6A-aware model adds a fifth input channel for m6A MeRIP-seq signal alongside the four-channel RNA one-hot encoding.
