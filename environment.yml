@@ -1,0 +1,22 @@
+name: transrbp
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - pytorch=2.0.1
+  - torchvision
+  - torchaudio
+  - pytorch-cuda=11.8
+  - pip
+  - pip:
+    - numpy
+    - scipy
+    - pandas
+    - h5py
+    - pyBigWig
+    - biopython
+    - pyfaidx
+    - captum
+    - tqdm
