@@ -26,7 +26,7 @@ pip install -e .
 After `pip install -e .`, all scripts can be run directly from the `TransRBP-m6A/` directory without any path configuration:
 
 ```bash
-cd TransRBP-m6A/
+cd TransRBP/
 python evaluation/predict.py --help
 ```
 
@@ -43,7 +43,7 @@ Pre-trained full model (5-channels) weights and train/val/test BED files for all
 2. **Download from Zenodo and place files inside the repo root.** The expected layout is:
 
 ```
-TransRBP-m6A/                  ← repo root (git clone destination)
+TransRBP/                      ← repo root (git clone destination)
 ├── models/                    ← from Zenodo: pre-trained .pth files
 │   ├── AKAP1.pth
 │   ├── FMR1.pth
@@ -337,7 +337,7 @@ python training/train_nohomo.py \
 ## Repository Structure
 
 ```
-TransRBP-m6A/
+TransRBP/
 ├── model/
 │   ├── RBPResTransModels.py    # TransRBP model (RBPModel class)
 │   ├── TransformerBlocks.py    # Transformer encoder with attention recording
