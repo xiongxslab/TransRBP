@@ -368,4 +368,4 @@ If you use TransRBP in your research, please cite:
 
 > Jianche Liu<sup>#</sup>, Xinlu Zhu<sup>#</sup>, Yao An<sup>#</sup>, Yang Yin<sup>#</sup>, Zhoutong Xu, Aowen Wang, Zexiang Zhou, Jialin He, Lei Xiong, Xiaoyu Li<sup>\*</sup>, Xushen Xiong<sup>\*</sup>  
 > **TransRBP unravels m6A-RBP interaction and reveals its disease implications**  
-> *[Journal]* (2025). DOI: [DOI]
+> *[Journal]* (2026). DOI: [DOI]
