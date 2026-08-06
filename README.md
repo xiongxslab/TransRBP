@@ -23,7 +23,7 @@ pip install -e .
 ```
 
 
-After `pip install -e .`, all scripts can be run directly from the `TransRBP-m6A/` directory without any path configuration:
+After `pip install -e .`, all scripts can be run directly from the `TransRBP/` directory without any path configuration:
 
 ```bash
 cd TransRBP/
