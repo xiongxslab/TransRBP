@@ -317,7 +317,7 @@ python training/train_nohomo.py \
 
 ### Option B — Chromosome split (not recommended)
 
-Pass the **full unfiltered ENCODE peak BED file** (not the pre-split Zenodo files). The dataset handles everything internally:
+Pass the **full unfiltered ENCODE peak BED file from ENCODE** (not the pre-split Zenodo files). The dataset handles everything internally:
 - **Chromosome split**: val = chr2/3/4, test = chr1/8/9, train = all others
 - **Data augmentation**: slides an 800 bp window across each peak (step = peak\_length/10), generating multiple windows per peak
 - **Downsampling**: randomly caps at 20,000 total windows (14,000 train / 4,000 val / 2,000 test)
