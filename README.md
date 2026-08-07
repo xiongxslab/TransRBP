@@ -279,10 +279,15 @@ Place the resulting `{RBP}_plus.bw` and `{RBP}_minus.bw` files in a single direc
 
 ### Option A — Chromosome split (not recommended)
 
+Pass the **full unfiltered ENCODE peak BED file** (not the pre-split Zenodo files). The dataset handles everything internally:
+- **Chromosome split**: val = chr2/3/4, test = chr1/8/9, train = all others
+- **Data augmentation**: slides an 800 bp window across each peak (step = peak\_length/10), generating multiple windows per peak
+- **Downsampling**: randomly caps at 20,000 total windows (14,000 train / 4,000 val / 2,000 test)
+
 ```bash
 python training/main.py \
   --rbp        FMR1 \
-  --peak_bed   data/FMR1_train.bed \
+  --peak_bed   /path/to/FMR1_ENCODE_peaks.bed \
   --bw_root    /path/to/bamCompare_bw \
   --chrom_root hg38/dna_sequence \
   --m6A_bw_plus  m6A_bw/m6A_plus.bw \
@@ -293,7 +298,6 @@ python training/main.py \
   --device cuda:0
 ```
 
-Chromosome split: val = chr2/3/4, test = chr1/8/9, train = all others.
 
 ### Option B — No-homology training (used for the 32 m6A-associated RBPs training in the paper)
 
