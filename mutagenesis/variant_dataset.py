@@ -1,10 +1,29 @@
 from pyfaidx import Fasta
 from Bio.Seq import Seq
+import numpy as np
+import pyBigWig
 import torch
 import csv
 
-def extract_sequences(reference_genome_path, input_table_path):
-  
+def read_m6A(m6A_bw_plus, m6A_bw_minus, chromosome, start, end, strand):
+    """
+    m6A MeRIP-seq signal over genomic [start, end) on the given strand,
+    oriented 5'->3' like the sequence (NaN -> 0, negatives clipped to 0).
+    """
+    bw = pyBigWig.open(m6A_bw_plus if strand == '+' else m6A_bw_minus)
+    signal = np.nan_to_num(np.array(bw.values(chromosome, start, end), dtype=np.float32), nan=0.0)
+    bw.close()
+    signal[signal < 0] = 0.0
+    if strand == '-':
+        signal = signal[::-1].copy()
+    return signal
+
+def extract_sequences(reference_genome_path, input_table_path, m6A_bw_plus=None, m6A_bw_minus=None):
+    """
+    Builds reference / alternative 800 nt windows centred on each variant
+    (variant at index 400 on the + strand). If m6A BigWigs are given, the m6A
+    signal of the window is attached (identical for reference and alternative).
+    """
     # Load the reference genome
     genome = Fasta(reference_genome_path)
     results = []
@@ -67,6 +86,8 @@ def extract_sequences(reference_genome_path, input_table_path):
                 'original_sequence': seq_region,
                 'mutated_sequence': mutated_seq
             }
+            if m6A_bw_plus is not None:
+                result['m6A_signal'] = read_m6A(m6A_bw_plus, m6A_bw_minus, chromosome, start, end + 1, strand)
             results.append(result)
 
     return results
@@ -90,7 +111,8 @@ def one_hot_encode_sequence(seq):
 def prepare_data(results):
     """
     Prepares data by one-hot encoding sequences and converting them into tensors.
-    Returns two tensors: reference_tensors and alternative_tensors.
+    Returns reference_tensors and alternative_tensors, shape (N, 800, 4), or
+    (N, 800, 5) with the m6A signal as the last channel when it was extracted.
     """
     reference_sequences = []
     alternative_sequences = []
@@ -109,6 +131,12 @@ def prepare_data(results):
     # Convert lists to tensors
     reference_tensors = torch.tensor(reference_sequences, dtype=torch.float32)
     alternative_tensors = torch.tensor(alternative_sequences, dtype=torch.float32)
+
+    if results and 'm6A_signal' in results[0]:
+        m6A = torch.tensor(np.stack([entry['m6A_signal'] for entry in results]),
+                           dtype=torch.float32).unsqueeze(-1)       # (N, 800, 1)
+        reference_tensors   = torch.cat([reference_tensors,   m6A], dim=-1)
+        alternative_tensors = torch.cat([alternative_tensors, m6A], dim=-1)
 
     return reference_tensors, alternative_tensors
 

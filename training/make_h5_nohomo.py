@@ -19,10 +19,15 @@ Example:
     python training/make_h5_nohomo.py \\
         --rbp FMR1 \\
         --bed_root  data/ \\
-        --bw_root   /path/to/bamCompare_1_bw \\
+        --bw_root   /path/to/bamCompare_bw \\
         --chrom_root /path/to/hg38/dna_sequence \\
-        --m6A_track  m6A_GLORI_K562proxy \\
+        --m6A_track  m6A \\
         --output_dir ./h5_cache
+
+--m6A_track m6A reads {bw_root}/m6A_plus.bw / m6A_minus.bw (MeRIP-seq log2 IP/input,
+the Zenodo m6A_bw/ files) and reproduces the released models. Use
+--m6A_track m6A_GLORI_K562proxy for the single-nucleotide GLORI comparison
+(Extended Data Fig. 3f; track built with preprocessing/glori/).
 
 Run all 32 RBPs in parallel:
     RBPs=(AKAP1 APOBEC3C CPSF6 DDX3X DDX43 DDX55 DDX6 EIF4E FMR1 FTO \\
@@ -54,8 +59,9 @@ parser.add_argument('--chrom_root',   required=True,
                     help='Dir with {chrom}.fa.gz per-chromosome FASTA files')
 parser.add_argument('--output_dir',   required=True,
                     help='Output directory for HDF5 files')
-parser.add_argument('--m6A_track',    default='m6A_GLORI_K562proxy',
-                    help='Name prefix for m6A BigWig files in bw_root')
+parser.add_argument('--m6A_track',    default='m6A',
+                    help='Name prefix for m6A BigWig files in bw_root: m6A (MeRIP-seq, released models) '
+                         'or m6A_GLORI_K562proxy (GLORI)')
 parser.add_argument('--m6A_binding',  type=int, default=1,
                     help='1 = 5-channel input (seq + m6A); 0 = 4-channel seq only')
 args = parser.parse_args()
@@ -127,10 +133,10 @@ def write_split(h5file, split, windows, chrom_seqs, bw_handles):
 
     ds_in  = h5file.create_dataset(
         f'{split}/inputs', shape=(N, n_in, L), dtype='float16',
-        chunks=(64, n_in, L), compression='lzf')
+        chunks=(max(1, min(64, N)), n_in, L), compression='lzf')
     ds_out = h5file.create_dataset(
         f'{split}/labels', shape=(N, 1, L), dtype='float16',
-        chunks=(64, 1, L), compression='lzf')
+        chunks=(max(1, min(64, N)), 1, L), compression='lzf')
 
     for i, (chrom, start, end, strand) in enumerate(
             tqdm(windows, desc=f'  {split} ({N})')):

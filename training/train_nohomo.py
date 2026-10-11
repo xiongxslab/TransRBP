@@ -1,5 +1,5 @@
 """
-Train TransRBP on no-homology HDF5 data (GLORI m6A channel).
+Train TransRBP on no-homology HDF5 data (5-channel input from make_h5_nohomo.py).
 
 Data must first be generated with make_h5_nohomo.py.
 All data is pre-loaded into RAM (fast GPU transfer, num_workers=0).

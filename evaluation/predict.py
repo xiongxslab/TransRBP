@@ -165,6 +165,8 @@ def main():
     print(f'{args.rbp_name}: {len(dataset)} regions')
 
     csv_rows = []
+    if args.output_h5:
+        os.makedirs(os.path.dirname(os.path.abspath(args.output_h5)), exist_ok=True)
     h5f = h5py.File(args.output_h5, 'w') if args.output_h5 else None
 
     for x, regions in tqdm(loader, desc='Predicting'):

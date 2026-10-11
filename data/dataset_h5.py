@@ -36,6 +36,3 @@ class RBPDataset(Dataset):
 
     def __getitem__(self, i):
         return self.inputs[i], self.labels[i]
-
-
-    print('m6A nonzero :', (x[4] > 0).sum().item(), 'positions')

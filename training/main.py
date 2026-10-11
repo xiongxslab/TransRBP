@@ -7,7 +7,7 @@ Early stopping on validation PCC. Best checkpoint saved to --save_model_dir/{RBP
 Example (m6A-binding model):
     python training/main.py \\
         --rbp FMR1 \\
-        --peak_bed  data/FMR1.bed \\
+        --peak_bed  /path/to/FMR1_ENCODE_peaks.bed \\
         --bw_root   /path/to/bamCompare_1_bw \\
         --chrom_root /path/to/hg38/dna_sequence \\
         --m6A_bw_plus  /path/to/m6A_plus.bw \\
@@ -50,7 +50,7 @@ parser.add_argument('--device',        default='cuda:0')
 parser.add_argument('--bs',            type=int,   default=64)
 parser.add_argument('--num_workers',   type=int,   default=0,
                     help='DataLoader workers (default 0; set >0 on Linux for speed)')
-parser.add_argument('--lr',            type=float, default=1e-5)
+parser.add_argument('--lr',            type=float, default=1e-3)
 parser.add_argument('--random_seed',   type=int,   default=43)
 parser.add_argument('--max_epoch',     type=int,   default=100)
 parser.add_argument('--tol_epoch',     type=int,   default=10)

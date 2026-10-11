@@ -26,11 +26,12 @@ class RBPDataset(Dataset):
         mode       : 'train', 'val', or 'test'
         m6A_binding: 1 = 5-channel input (seq + m6A); 0 = 4-channel seq only
         total_num  : maximum windows to sample (default 20000; 70/20/10 split)
+        seed       : window-sampling seed, reset before each split is sampled (43 in the paper)
     """
 
     def __init__(self, RBP_name, peak_bed, bw_root, chrom_root,
                  m6A_bw_plus=None, m6A_bw_minus=None,
-                 mode='train', m6A_binding=1, total_num=20000):
+                 mode='train', m6A_binding=1, total_num=20000, seed=43):
 
         self.RBP_name    = RBP_name
         self.bw_root     = bw_root
@@ -40,6 +41,7 @@ class RBPDataset(Dataset):
         self.m6A_binding = m6A_binding
         self.mode        = mode
         self.input_len   = 800
+        self.seed        = seed
 
         self.val_chr  = ['chr2', 'chr3', 'chr4']
         self.test_chr = ['chr1', 'chr8', 'chr9']
@@ -103,6 +105,7 @@ class RBPDataset(Dataset):
         )
 
     def _sample(self, seq, n):
+        random.seed(self.seed)
         return random.sample(seq, min(len(seq), n))
 
     def _get_seq(self, chrom_root, chrom, start, end, direction):

@@ -2,6 +2,7 @@ name: transrbp
 channels:
   - pytorch
   - conda-forge
+  - bioconda
   - defaults
   - nvidia
 dependencies:
@@ -10,6 +11,7 @@ dependencies:
   - torchvision
   - torchaudio
   - pytorch-cuda=11.8
+  - blast=2.17.0        # BLAST+ (makeblastdb, blastn) for the no-homology splits and RBPNet benchmark
   - pip
   - pip:
     - numpy
@@ -21,3 +23,5 @@ dependencies:
     - pyfaidx
     - captum
     - tqdm
+    - tensorboard
+    - matplotlib
