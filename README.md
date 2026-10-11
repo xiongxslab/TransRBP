@@ -226,7 +226,7 @@ python demethylation/insilico_demethylation.py \
 
 Scores the effect of single-nucleotide variants on predicted RBP binding as the KL divergence KL(alt ‖ ref) between the alternative- and reference-allele 800 nt binding profiles.
 
-The variant analyses use **both** model types: the sequence-only TransRBP (4-channel input, `--features 4`, default) and the full model (sequence + m6A, `--features 5`). The full model is the released model (Zenodo `models/`); the sequence-only models are not part of the Zenodo deposit, so **retrain one sequence-only model per RBP first** (see [Sequence-only models](#sequence-only-models-for-the-variant-analyses)) and pass it with `--model_path`.
+The variant analyses use **both** model types: the sequence-only TransRBP (4-channel input, `--features 4`, default) and the full model (sequence + m6A, `--features 5`). The sequence-only models need to be trained by user, so **retrain one sequence-only model per RBP first** (see [Sequence-only models](#sequence-only-models-for-the-variant-analyses)) and pass it with `--model_path`.
 
 ```bash
 python mutagenesis/variant_impact.py \
