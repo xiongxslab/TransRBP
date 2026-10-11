@@ -445,7 +445,7 @@ The GLORI model is trained with the same procedure as the released models (`trai
 The variant impact analysis is run with two model types:
 
 - **Full model** (sequence + m6A): the released models (Zenodo `models/`) — no retraining needed.
-- **Sequence-only model** (4-channel input, no m6A channel): **not included in the Zenodo deposit. Retrain one sequence-only model per RBP before running the variant impact analysis.**
+- **Sequence-only model** (4-channel input, no m6A channel): **Retrain one sequence-only model per RBP before running the variant impact analysis.**
 
 Train the sequence-only models on the same no-homology splits (`data/{RBP}_{train,val,test}.bed`) and with the same procedure as the released models, for every RBP in `rbp_list.txt`:
 
