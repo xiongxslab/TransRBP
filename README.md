@@ -2,7 +2,7 @@
 
 TransRBP predicts RNA-binding protein (RBP) binding signal from sequence using a ResNet-Transformer architecture. The m6A-aware model adds a fifth input channel for m6A MeRIP-seq signal alongside the four-channel RNA one-hot encoding.
 
-This repository contains the full model code, data preparation (eCLIP and MeRIP-seq tracks, no-homology splits), training (including multi-task pretraining / fine-tuning and the single-nucleotide GLORI m6A model), the RBPNet benchmark, evaluation, interpretation (full-model Integrated Gradients and motif discovery), in silico demethylation, variant impact scoring and the ClinVar disease-variant analysis. See [Reproducing the paper analyses](#reproducing-the-paper-analyses) for the scripts.
+This repository contains the full model code, data preparation (eCLIP and MeRIP-seq tracks, no-homology splits), training (including multi-task pretraining / fine-tuning and the single-nucleotide GLORI m6A model), the RBPNet benchmark, evaluation, interpretation (full-model Integrated Gradients and motif discovery), in silico demethylation, variant impact scoring and the ClinVar disease-variant analysis. See [Reproducing the paper analyses](#reproducing-the-paper-analyses) for the scripts we used for behind figures.
 
 ![TransRBP Overview](Overview.png)
 
