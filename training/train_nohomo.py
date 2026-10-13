@@ -134,11 +134,11 @@ def train():
         val_pcc_record.append(val_pcc)
         scheduler.step()
 
-        if args.save_model_dir:
-            os.makedirs(args.save_model_dir, exist_ok=True)
-            best_pcc, _ = get_max(val_pcc_record)
-            if val_pcc_record[-1] == best_pcc:
-                best_model_wts = copy.deepcopy(model.state_dict())
+        # keep the best weights in memory (written to disk only with --save_model_dir); take them from the
+        # uncompiled module so that the keys have no torch.compile '_orig_mod.' prefix
+        best_pcc, _ = get_max(val_pcc_record)
+        if val_pcc_record[-1] == best_pcc:
+            best_model_wts = copy.deepcopy(getattr(model, '_orig_mod', model).state_dict())
 
         best_pcc, best_idx = get_max(val_pcc_record)
         n = len(val_pcc_record)
@@ -172,6 +172,7 @@ def train():
     print(f'Test   PCC={test_pcc:.4f}  SCC={test_scc:.4f}')
 
     if args.save_model_dir:
+        os.makedirs(args.save_model_dir, exist_ok=True)
         out_path = os.path.join(args.save_model_dir, f'{args.rbp}.pth')
         torch.save(best_model_wts, out_path)
         print(f'Model saved → {out_path}')

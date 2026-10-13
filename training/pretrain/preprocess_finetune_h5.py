@@ -41,6 +41,8 @@ parser.add_argument('--bed_root',      required=True)
 parser.add_argument('--bw_root',       required=True)
 parser.add_argument('--chrom_root',    required=True)
 parser.add_argument('--out_dir',       required=True)
+parser.add_argument('--m6A_bw_plus',   default=None, help='m6A BigWig, + strand (default {bw_root}/m6A_plus.bw)')
+parser.add_argument('--m6A_bw_minus',  default=None, help='m6A BigWig, - strand (default {bw_root}/m6A_minus.bw)')
 parser.add_argument('--total_windows', type=int, default=20000)
 args = parser.parse_args()
 
@@ -155,8 +157,8 @@ def process_rbp(rbp, bed_root, bw_root, chrom_seqs, out_dir, total_windows):
     bw = {
         'rbp_plus':  pbw.open(f'{bw_root}/{rbp}_plus.bw'),
         'rbp_minus': pbw.open(f'{bw_root}/{rbp}_minus.bw'),
-        'm6a_plus':  pbw.open(f'{bw_root}/m6A_plus.bw'),
-        'm6a_minus': pbw.open(f'{bw_root}/m6A_minus.bw'),
+        'm6a_plus':  pbw.open(args.m6A_bw_plus or f'{bw_root}/m6A_plus.bw'),
+        'm6a_minus': pbw.open(args.m6A_bw_minus or f'{bw_root}/m6A_minus.bw'),
     }
 
     splits = [('train', train_wins), ('val', val_wins), ('test', test_wins)]

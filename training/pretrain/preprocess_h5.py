@@ -47,6 +47,8 @@ parser.add_argument('--chrom_root',    required=True)
 parser.add_argument('--output',        required=True, help='Path for output .h5 file')
 parser.add_argument('--total_windows', type=int, default=100000)
 parser.add_argument('--m6A_binding',   type=int, default=1)
+parser.add_argument('--m6A_bw_plus',   default=None, help='m6A BigWig, + strand (default {bw_root}/m6A_plus.bw)')
+parser.add_argument('--m6A_bw_minus',  default=None, help='m6A BigWig, - strand (default {bw_root}/m6A_minus.bw)')
 args = parser.parse_args()
 
 
@@ -72,7 +74,8 @@ def open_bw_handles(bw_root, rbp_list, m6A_binding):
     for name in tqdm(names, desc='Opening BigWig handles'):
         for strand in ('plus', 'minus'):
             key = f'{name}_{strand}'
-            handles[key] = pbw.open(f'{bw_root}/{key}.bw')
+            path = {'m6A_plus': args.m6A_bw_plus, 'm6A_minus': args.m6A_bw_minus}.get(key) or f'{bw_root}/{key}.bw'
+            handles[key] = pbw.open(path)
     return handles
 
 

@@ -47,15 +47,18 @@ def extract_sequences(reference_genome_path, input_table_path, m6A_bw_plus=None,
 
             # Calculate start and end indices for 800 bp region
             start = position0 - 400
-            end = position0 + 399  # pyfaidx is end-inclusive
+            end = position0 + 399  # last position of the window (inclusive)
 
-            # Ensure indices are within chromosome bounds
+            # Parts of the window beyond a chromosome end are padded with N (and zero m6A signal), so every
+            # window is 800 nt and the variant stays at index 400 (+ strand) / 399 (- strand)
             seq_length = len(genome[chromosome])
-            start = max(start, 0)
-            end = min(end, seq_length - 1)
+            pad_left = max(0, -start)
+            pad_right = max(0, end - (seq_length - 1))
+            start_in, end_in = start + pad_left, end - pad_right   # part of the window inside the chromosome
 
             # Extract sequence region
-            seq_region = genome[chromosome][start:end+1].seq
+            inside = genome[chromosome][start_in:end_in+1].seq if end_in >= start_in else ''
+            seq_region = 'N' * pad_left + inside + 'N' * pad_right
             pos_in_seq = position0 - start  # Position within seq_region
 
             # Handle strand information
@@ -87,7 +90,11 @@ def extract_sequences(reference_genome_path, input_table_path, m6A_bw_plus=None,
                 'mutated_sequence': mutated_seq
             }
             if m6A_bw_plus is not None:
-                result['m6A_signal'] = read_m6A(m6A_bw_plus, m6A_bw_minus, chromosome, start, end + 1, strand)
+                signal = read_m6A(m6A_bw_plus, m6A_bw_minus, chromosome, start_in, end_in + 1, strand)
+                # zero padding on the padded side(s), in the 5'->3' orientation of the window
+                before, after = (pad_left, pad_right) if strand == '+' else (pad_right, pad_left)
+                result['m6A_signal'] = np.concatenate([np.zeros(before, np.float32), signal,
+                                                       np.zeros(after, np.float32)])
             results.append(result)
 
     return results

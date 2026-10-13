@@ -88,14 +88,23 @@ class Scorer:
         self.model = model.to(self.device).eval()
 
     def window(self, chrom, pos0, strand):
-        """[pos0-400, pos0+400) on the given strand; returns (RNA sequence, index of pos0)."""
-        seq = self.genome[chrom][pos0 - HALF:pos0 + HALF]
-        seq = (seq.reverse.complement.seq if strand == '-' else seq.seq).upper().replace('T', 'U')
+        """[pos0-400, pos0+400) on the given strand; returns (RNA sequence, index of pos0).
+        Parts of the window beyond a chromosome end are padded with N, so the window is always 800 nt."""
+        lo, hi = pos0 - HALF, pos0 + HALF
+        a, b = max(lo, 0), min(hi, len(self.genome[chrom]))
+        seq = 'N' * (a - lo) + (self.genome[chrom][a:b].seq if b > a else '') + 'N' * (hi - b)
+        seq = seq.upper().replace('T', 'U')
+        if strand == '-':
+            seq = seq.translate(COMP)[::-1]                       # reverse complement (N stays N)
         return seq, (HALF if strand == '+' else HALF - 1)
 
     def m6A(self, chrom, pos0, strand):
         bw  = pyBigWig.open(self.m6A_bw[0] if strand == '+' else self.m6A_bw[1])
-        sig = np.nan_to_num(np.array(bw.values(chrom, pos0 - HALF, pos0 + HALF), dtype=np.float32), nan=0.0)
+        lo, hi = pos0 - HALF, pos0 + HALF
+        a, b = max(lo, 0), min(hi, bw.chroms(chrom) or 0)        # zero signal beyond a chromosome end
+        sig = np.zeros(2 * HALF, dtype=np.float32)
+        if b > a:
+            sig[a - lo:b - lo] = np.nan_to_num(np.array(bw.values(chrom, a, b), dtype=np.float32), nan=0.0)
         bw.close()
         sig[sig < 0] = 0.0
         return sig[::-1].copy() if strand == '-' else sig

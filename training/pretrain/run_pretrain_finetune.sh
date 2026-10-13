@@ -5,10 +5,11 @@
 #
 # Usage (from the repo root):
 #   bash training/pretrain/run_pretrain_finetune.sh \
-#        rbp_list.txt /path/to/RBP_bed /path/to/bamCompare_bw hg38/dna_sequence out_dir cuda:0
+#        rbp_list.txt /path/to/RBP_bed /path/to/bamCompare_bw hg38/dna_sequence out_dir cuda:0 \
+#        m6A_bw/m6A_plus.bw m6A_bw/m6A_minus.bw
 #
-# bw_root must contain {RBP}_plus.bw / {RBP}_minus.bw for every RBP and
-# m6A_plus.bw / m6A_minus.bw (the m6A input channel).
+# bw_root must contain {RBP}_plus.bw / {RBP}_minus.bw for every RBP. The last two (optional) arguments are
+# the m6A BigWigs (the m6A input channel); default: bw_root/m6A_plus.bw and bw_root/m6A_minus.bw.
 # =============================================================================
 set -euo pipefail
 
@@ -18,6 +19,8 @@ BW_ROOT=$3
 CHROM_ROOT=$4
 OUT=$5
 DEVICE=${6:-cuda:0}
+M6A_PLUS=${7:-$BW_ROOT/m6A_plus.bw}
+M6A_MINUS=${8:-$BW_ROOT/m6A_minus.bw}
 
 mkdir -p "$OUT/h5_cache/finetune" "$OUT/models_pretrain" "$OUT/models_finetune" "$OUT/metrics"
 H5=$OUT/h5_cache/32rbp_m6a_100k.h5
@@ -32,7 +35,9 @@ if [ ! -f "$H5" ]; then
         --chrom_root    "$CHROM_ROOT" \
         --output        "$H5" \
         --total_windows 100000 \
-        --m6A_binding   1
+        --m6A_binding   1 \
+        --m6A_bw_plus   "$M6A_PLUS" \
+        --m6A_bw_minus  "$M6A_MINUS"
 fi
 
 # ---- Step 2: multi-task pretraining ----
@@ -65,7 +70,9 @@ python -u training/pretrain/preprocess_finetune_h5.py \
     --bw_root    "$BW_ROOT" \
     --chrom_root "$CHROM_ROOT" \
     --out_dir    "$OUT/h5_cache/finetune" \
-    --total_windows 20000
+    --total_windows 20000 \
+    --m6A_bw_plus  "$M6A_PLUS" \
+    --m6A_bw_minus "$M6A_MINUS"
 
 # ---- Step 4: fine-tune the task head for each RBP ----
 while IFS= read -r rbp; do

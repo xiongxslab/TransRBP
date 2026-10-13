@@ -21,13 +21,14 @@ Example:
         --bed_root  data/ \\
         --bw_root   /path/to/bamCompare_bw \\
         --chrom_root /path/to/hg38/dna_sequence \\
-        --m6A_track  m6A \\
+        --m6A_bw_plus  m6A_bw/m6A_plus.bw \\
+        --m6A_bw_minus m6A_bw/m6A_minus.bw \\
         --output_dir ./h5_cache
 
---m6A_track m6A reads {bw_root}/m6A_plus.bw / m6A_minus.bw (MeRIP-seq log2 IP/input,
-the Zenodo m6A_bw/ files) and reproduces the released models. Use
---m6A_track m6A_GLORI_K562proxy for the single-nucleotide GLORI comparison
-(Extended Data Fig. 3f; track built with preprocessing/glori/).
+The m6A input channel is read from --m6A_bw_plus / --m6A_bw_minus (MeRIP-seq log2 IP/input; the Zenodo
+m6A_bw/ files reproduce the released models). Without these two options it is read from
+{bw_root}/{m6A_track}_plus.bw / _minus.bw; e.g. --m6A_track m6A_GLORI_K562proxy for the single-nucleotide
+GLORI comparison (Extended Data Fig. 3f; track built with preprocessing/glori/).
 
 Run all 32 RBPs in parallel:
     RBPs=(AKAP1 APOBEC3C CPSF6 DDX3X DDX43 DDX55 DDX6 EIF4E FMR1 FTO \\
@@ -62,6 +63,12 @@ parser.add_argument('--output_dir',   required=True,
 parser.add_argument('--m6A_track',    default='m6A',
                     help='Name prefix for m6A BigWig files in bw_root: m6A (MeRIP-seq, released models) '
                          'or m6A_GLORI_K562proxy (GLORI)')
+parser.add_argument('--m6A_bw_plus',  default=None,
+                    help='m6A BigWig, + strand (e.g. m6A_bw/m6A_plus.bw from Zenodo); '
+                         'default {bw_root}/{m6A_track}_plus.bw')
+parser.add_argument('--m6A_bw_minus', default=None,
+                    help='m6A BigWig, - strand (e.g. m6A_bw/m6A_minus.bw from Zenodo); '
+                         'default {bw_root}/{m6A_track}_minus.bw')
 parser.add_argument('--m6A_binding',  type=int, default=1,
                     help='1 = 5-channel input (seq + m6A); 0 = 4-channel seq only')
 args = parser.parse_args()
@@ -89,12 +96,13 @@ def load_chrom_seqs(chrom_root, chroms):
     return seqs
 
 
-def open_bw_handles(bw_root, tracks):
+def open_bw_handles(bw_root, tracks, paths=None):
+    """{track}_{plus,minus} -> BigWig handle; paths overrides the default {bw_root}/{track}_{strand}.bw."""
     handles = {}
     for name in tqdm(tracks, desc='Opening BigWig handles'):
         for strand in ('plus', 'minus'):
             key  = f'{name}_{strand}'
-            path = f'{bw_root}/{key}.bw'
+            path = (paths or {}).get(key) or f'{bw_root}/{key}.bw'
             handles[key] = pbw.open(path)
     return handles
 
@@ -170,7 +178,11 @@ def main():
     tracks = [args.rbp]
     if args.m6A_binding:
         tracks.append(args.m6A_track)
-    bw_handles = open_bw_handles(args.bw_root, tracks)
+    m6A_paths = {}
+    if args.m6A_bw_plus or args.m6A_bw_minus:
+        assert args.m6A_bw_plus and args.m6A_bw_minus, 'give both --m6A_bw_plus and --m6A_bw_minus'
+        m6A_paths = {f'{args.m6A_track}_plus': args.m6A_bw_plus, f'{args.m6A_track}_minus': args.m6A_bw_minus}
+    bw_handles = open_bw_handles(args.bw_root, tracks, m6A_paths)
 
     os.makedirs(args.output_dir, exist_ok=True)
     out_path = os.path.join(args.output_dir, f'{args.rbp}.h5')

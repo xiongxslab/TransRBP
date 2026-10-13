@@ -78,6 +78,15 @@ The Zenodo deposit contains four top-level folders: `models/`, `data/`, `hg38/`,
 | `hg38/all/`          | Combined `hg38.fa` + index — used by variant impact scoring                  |
 | `m6A_bw/`            | `m6A_plus.bw` and `m6A_minus.bw` (K562 MeRIP-seq log2 IP/input, the m6A input channel of the released models) |
 
+**RBP list (`rbp_list.txt`).** Several commands below take `--rbp_list rbp_list.txt`: a plain-text file with one RBP name per line, spelled as in the file names (`data/{RBP}_train.bed`, `{RBP}_plus.bw`, `models/{RBP}.pth`), for example:
+
+```
+FMR1
+UPF1
+DDX3X
+FXR2
+```
+
 
 ---
 
@@ -85,7 +94,7 @@ The Zenodo deposit contains four top-level folders: `models/`, `data/`, `hg38/`,
 
 ### 1. Predict binding signal on genomic regions
 
-Given any set of genomic regions (BED file), the model predicts the RBP binding signal using the local sequence and m6A context.
+Given a set of 800 bp genomic windows (BED file), the model predicts the RBP binding signal using the local sequence and m6A context.
 
 ```bash
 python evaluation/predict.py \
@@ -99,7 +108,7 @@ python evaluation/predict.py \
   --output_h5  FMR1_predictions.h5    # optional: save full 800 bp tracks
 ```
 
-**Input BED:** standard BED6 format (`chrom, start, end, name, score, strand`). Each row defines one 800 bp window; coordinates are used directly.
+**Input BED:** standard BED6 format (`chrom, start, end, name, score, strand`). Each row must be one 800 bp window (`end − start = 800`, as in the Zenodo `data/{RBP}_test.bed` files); coordinates are used directly, so regions of other lengths (e.g. peaks) must first be converted to 800 bp windows.
 
 **Output CSV columns:**
 
@@ -324,11 +333,12 @@ python training/make_h5_nohomo.py \
   --bed_root   data/ \
   --bw_root    /path/to/bamCompare_bw \
   --chrom_root hg38/dna_sequence \
-  --m6A_track  m6A \
+  --m6A_bw_plus  m6A_bw/m6A_plus.bw \
+  --m6A_bw_minus m6A_bw/m6A_minus.bw \
   --output_dir ./h5_cache
 ```
 
-`--m6A_track m6A` reads `m6A_plus.bw` / `m6A_minus.bw` (MeRIP-seq) from `--bw_root` and reproduces the released models.
+`--bw_root` holds the RBP eCLIP BigWigs (`{RBP}_plus.bw` / `{RBP}_minus.bw`); the m6A input channel is read from `--m6A_bw_plus` / `--m6A_bw_minus` (the Zenodo `m6A_bw/` MeRIP-seq files reproduce the released models). If these two options are omitted, `{bw_root}/{m6A_track}_plus.bw` / `_minus.bw` are used (`--m6A_track`, default `m6A`).
 
 To run all 32 RBPs in parallel:
 
@@ -416,10 +426,11 @@ python benchmark/rbpnet/train.py --rbp rbp_list.txt --peak_root RBP_bed/ --bw_ro
 A multi-task TransRBP (`model/pretrain/RBPMultiTaskModel.py`; same backbone, 2-layer position-wise head with 32 outputs) is pretrained jointly on the 32 m6A-associated RBPs (100,000 windows), and the head is then fine-tuned for each RBP (backbone frozen, 20,000 windows per RBP):
 
 ```bash
-bash training/pretrain/run_pretrain_finetune.sh rbp_list.txt RBP_bed/ bamCompare_bw/ hg38/dna_sequence pretrain_out/ cuda:0
+bash training/pretrain/run_pretrain_finetune.sh rbp_list.txt RBP_bed/ bamCompare_bw/ hg38/dna_sequence pretrain_out/ cuda:0 \
+    m6A_bw/m6A_plus.bw m6A_bw/m6A_minus.bw
 ```
 
-`bamCompare_bw/` must contain the RBP BigWigs and `m6A_plus.bw` / `m6A_minus.bw`. Steps: `preprocess_h5.py` → `main_pretrain.py` (lr 1e-3) → `eval_pretrain.py` → `preprocess_finetune_h5.py` → `finetune_singletask.py` (`--freeze_mode head_only`, lr 1e-4).
+`bamCompare_bw/` must contain the RBP BigWigs; the last two arguments are the m6A BigWigs (if omitted, `bamCompare_bw/m6A_plus.bw` / `m6A_minus.bw` are used). Steps: `preprocess_h5.py` → `main_pretrain.py` (lr 1e-3) → `eval_pretrain.py` → `preprocess_finetune_h5.py` → `finetune_singletask.py` (`--freeze_mode head_only`, lr 1e-4).
 
 ### Single-nucleotide (GLORI) m6A model
 

@@ -319,10 +319,10 @@ def main():
 
         val_pcc_record.append(val_m['flat_pcc'])
 
-        if args.save_model_dir is not None:
-            max_, _ = get_max(val_pcc_record)
-            if val_pcc_record[-1] == max_:
-                best_model_wts = copy.deepcopy(model.state_dict())
+        # keep the best weights in memory; they are written to disk only with --save_model_dir
+        max_, _ = get_max(val_pcc_record)
+        if val_pcc_record[-1] == max_:
+            best_model_wts = copy.deepcopy(model.state_dict())
 
         scheduler.step()
         print(f'Epoch time: {time.time() - tick_epoch:.1f}s', flush=True)
