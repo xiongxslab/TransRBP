@@ -118,6 +118,8 @@ class DemethylationDataset(Dataset):
                 if overlap_start < overlap_end:
                     rel_s = overlap_start - win_start
                     rel_e = overlap_end   - win_start
+                    if direction == '-':                 # m6A track is 5'->3' (reversed) on the - strand
+                        rel_s, rel_e = self.input_len - rel_e, self.input_len - rel_s
                     m6a_ko[0, rel_s:rel_e] = 0.0         # partial KO
 
         seq_ko = torch.cat([seq, m6a_ko], dim=0)        # (5, 800)

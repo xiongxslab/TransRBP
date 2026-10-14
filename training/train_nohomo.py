@@ -64,7 +64,9 @@ def compute_scc(pred, label):
 
 
 def get_max(lst):
-    return max((v, i) for i, v in enumerate(lst))
+    """Best value and its epoch index. NaN (e.g. from constant predictions or labels) counts as the lowest
+    score, so it never blocks later epochs; among equal values the latest epoch wins."""
+    return max((v if np.isfinite(v) else -np.inf, i) for i, v in enumerate(lst))
 
 
 def train():
@@ -136,8 +138,8 @@ def train():
 
         # keep the best weights in memory (written to disk only with --save_model_dir); take them from the
         # uncompiled module so that the keys have no torch.compile '_orig_mod.' prefix
-        best_pcc, _ = get_max(val_pcc_record)
-        if val_pcc_record[-1] == best_pcc:
+        best_pcc, best_idx = get_max(val_pcc_record)
+        if best_idx == len(val_pcc_record) - 1:
             best_model_wts = copy.deepcopy(getattr(model, '_orig_mod', model).state_dict())
 
         best_pcc, best_idx = get_max(val_pcc_record)

@@ -91,8 +91,11 @@ class Scorer:
         """[pos0-400, pos0+400) on the given strand; returns (RNA sequence, index of pos0).
         Parts of the window beyond a chromosome end are padded with N, so the window is always 800 nt."""
         lo, hi = pos0 - HALF, pos0 + HALF
-        a, b = max(lo, 0), min(hi, len(self.genome[chrom]))
-        seq = 'N' * (a - lo) + (self.genome[chrom][a:b].seq if b > a else '') + 'N' * (hi - b)
+        a, b = max(lo, 0), min(hi, len(self.genome[chrom]))       # part of the window inside the chromosome
+        if b > a:
+            seq = 'N' * (a - lo) + self.genome[chrom][a:b].seq + 'N' * (hi - b)
+        else:
+            seq = 'N' * (hi - lo)                                  # window entirely outside the chromosome
         seq = seq.upper().replace('T', 'U')
         if strand == '-':
             seq = seq.translate(COMP)[::-1]                       # reverse complement (N stays N)
@@ -141,7 +144,10 @@ class Scorer:
             for line in f:
                 p = line.strip().split()
                 if len(p) >= 6:
-                    intervals.append((p[0], int(p[1]) - 800, int(p[2]) + 801, p[5]))
+                    # positions within 800 bp of the peak, clipped to the chromosome (no positions < 0 or
+                    # beyond the chromosome end)
+                    n_chrom = len(self.genome[p[0]])
+                    intervals.append((p[0], max(0, int(p[1]) - 800), min(n_chrom, int(p[2]) + 801), p[5]))
         sizes = np.array([e - s for _, s, e, _ in intervals])
         bounds = np.cumsum(sizes)
         total = int(bounds[-1])

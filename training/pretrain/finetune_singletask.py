@@ -160,7 +160,9 @@ def print_metrics(m, split):
 
 
 def get_max(lst):
-    val, idx = max((v, i) for i, v in enumerate(lst))
+    """Best value and its epoch index. NaN (e.g. from constant predictions or labels) counts as the lowest
+    score, so it never blocks later epochs; among equal values the latest epoch wins."""
+    val, idx = max((v if np.isfinite(v) else -np.inf, i) for i, v in enumerate(lst))
     return val, idx
 
 
@@ -320,8 +322,8 @@ def main():
         val_pcc_record.append(val_m['flat_pcc'])
 
         # keep the best weights in memory; they are written to disk only with --save_model_dir
-        max_, _ = get_max(val_pcc_record)
-        if val_pcc_record[-1] == max_:
+        max_, max_idx = get_max(val_pcc_record)
+        if max_idx == len(val_pcc_record) - 1:
             best_model_wts = copy.deepcopy(model.state_dict())
 
         scheduler.step()
